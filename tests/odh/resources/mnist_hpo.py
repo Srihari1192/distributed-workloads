@@ -1,3 +1,4 @@
+import argparse
 import os
 import tempfile
 
@@ -91,6 +92,7 @@ def get_data_loaders(batch_size=128):
 def train_mnist(config):
     should_checkpoint = config.get("should_checkpoint", False)
     use_cuda = torch.cuda.is_available()
+    print("Is CUDA available :",torch.cuda.is_available())
     device = torch.device("cuda" if use_cuda else "cpu")
     train_loader, test_loader = get_data_loaders()
     model = ConvNet().to(device)
@@ -114,10 +116,14 @@ def train_mnist(config):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="PyTorch MNIST Example")
+    parser.add_argument(
+        "--cuda", action="store_true", default=False, help="Enables GPU training"
+    )
+    args, _ = parser.parse_known_args()
     # for early stopping
     sched = AsyncHyperBandScheduler()
-    gpu_value="has to be specified"
-    resources_per_trial = {"cpu": 1, "gpu": gpu_value}
+    resources_per_trial = {"cpu": 1, "gpu": 1 if args.cuda else 0}
     tuner = tune.Tuner(
         tune.with_resources(train_mnist, resources=resources_per_trial),
         tune_config=tune.TuneConfig(

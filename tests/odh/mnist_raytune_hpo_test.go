@@ -17,7 +17,6 @@ limitations under the License.
 package odh
 
 import (
-	"bytes"
 	"fmt"
 	"testing"
 
@@ -81,12 +80,6 @@ func mnistRayTuneHpo(t *testing.T, numGpus int) {
 	// Test configuration
 	jupyterNotebookConfigMapFileName := "mnist_hpo_raytune.ipynb"
 	mnist_hpo := ReadFile(test, "resources/mnist_hpo.py")
-
-	if numGpus > 0 {
-		mnist_hpo = bytes.Replace(mnist_hpo, []byte("gpu_value=\"has to be specified\""), []byte("gpu_value=\"1\""), 1)
-	} else {
-		mnist_hpo = bytes.Replace(mnist_hpo, []byte("gpu_value=\"has to be specified\""), []byte("gpu_value=\"0\""), 1)
-	}
 
 	config := CreateConfigMap(test, namespace.Name, map[string][]byte{
 		// MNIST Raytune HPO Notebook
